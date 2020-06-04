@@ -1,0 +1,235 @@
+<!-- Botones -->
+<section id="actions" class="py-4 mb-4 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#agregarUsuarioModal">
+          <i class="fas fa-plus">Agregar Personaje</i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lista de Usuarios -->
+<section id="usuarios">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header">
+            <h4>Lista de Personajes</h4>
+          </div>
+          <table class="table table-striped">
+            <thead class="thead-dark">
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Raza</th>
+                <th>Monedas</th>
+                <th>Editar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let usuario of usuarios; let i = index">
+                <td>{{i+1}}</td>
+                <td>{{usuario.nombre}} {{usuario.apellido}}</td>
+                <td>{{usuario.raza}}</td>
+                <td>{{usuario.monedas | currency: 'MNX' : '$'}}</td>
+                <td>
+                  <a routerLink="/usuario/editar/{{usuario.id}}" class="btn btn-secondary">
+                    <i class="fas fa-id-badge"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!--Tarjetas laterales-->
+      <div class="col-md-3">
+        <div class="card text-center bg-danger text-white mb-3">
+          <div class="card-body">
+            <h3>Riqueza del Reino</h3>
+            <h4 class="display-5">
+              {{getMonedasTotal() | currency:'MNX':'$'}}
+            </h4>
+          </div>
+        </div>
+
+        <div class="card text-center bg-success text-white mb-3">
+          <div class="card-body">
+            <h3>Total Personajes</h3>
+            <h4 class="display-4">
+              <i class="fas fa-users"></i> {{usuarios?.length}}
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Agregar usuario-->
+<div class="modal fade" id="agregarUsuarioModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Agregar Personaje</h5>
+        <button class="close" data-dismiss="modal" #botonCerrar>
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <flash-messages></flash-messages>
+
+      <form #usuarioForm="ngForm" (ngSubmit)="agregar(usuarioForm)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              name="nombre"
+              class="form-control"
+              #nombre="ngModel"
+              [(ngModel)]="usuario.nombre"
+              [ngClass]="{'is-invalid': nombre.errors && nombre.touched}"
+              required
+              minlength="2">
+              <div [hidden]="!nombre.errors?.required" class="invalid-feedback">
+                Nombre requerido
+              </div>
+              <div [hidden]="!nombre.errors?.minlength" class="invalid-feedback">
+                Debe contener al menos 2 caracteres
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label for="apellido">Nombre de la Familia</label>
+            <input
+              type="text"
+              name="apellido"
+              class="form-control"
+              #apellido="ngModel"
+              [(ngModel)]="usuario.apellido"
+              [ngClass]="{'is-invalid': apellido.errors && apellido.touched}"
+              required
+              minlength="2">
+              <div [hidden]="!apellido.errors?.required" class="invalid-feedback">
+                Familia requerida
+              </div>
+              <div [hidden]="!apellido.errors?.minlength" class="invalid-feedback">
+                Debe contener al menos 2 caracteres
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label for="raza">Raza:</label>
+              <select
+              name="raza"
+              class="form-comtrol"
+              #raza="ngModel"
+              [(ngModel)]="usuario.raza"
+              >
+              <option>Humano</option>
+              <option>Elfo</option>
+              <option>Orco</option>
+              <option>Demonio</option>
+              </select>
+              <div [hidden]="!raza.errors?.required" class="invalid-feedback">
+                Raza requerida
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email del reino</label>
+            <input
+              type="email"
+              name="email"
+              class="form-control"
+              #email="ngModel"
+              [(ngModel)]="usuario.email"
+              [ngClass]="{'is-invalid': email.errors && email.touched}"
+              pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+              required>
+              <div [hidden]="!email.errors?.required" class="invalid-feedback">
+                Email requerido
+              </div>
+              <div [hidden]="!email.errors?.pattern" class="invalid-feedback">
+                Email no es válido
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label for="monedas">Monedas</label>
+            <input
+              type="number"
+              name="monedas"
+              class="form-control"
+              #saldo="ngModel"
+              [(ngModel)]="usuario.monedas"
+              [ngClass]="{'is-invalid': saldo.errors && saldo.touched}"
+              required>
+              <div [hidden]="!saldo.errors?.required" class="invalid-feedback">
+                Cantidad requerida
+              </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<!--Bolsa-->
+<div class="modal fade" id="bolsaModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Bolsa</h5>
+        <button class="close" data-dismiss="modal" #botonCerrar>
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <flash-messages></flash-messages>
+
+      <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Raza</th>
+            <th>Monedas</th>
+            <th>Editar</th>
+            <th>Bolsa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ng>
+            <td>{{usuario.nombre}} {{usuario.apellido}}</td>
+            <td>{{usuario.raza}}</td>
+            <td>{{usuario.monedas | currency: 'MNX' : '$'}}</td>
+            <td>
+              <a routerLink="/usuario/editar/{{usuario.id}}" class="btn btn-secondary">
+                <i class="fas fa-id-badge"></i>
+              </a>
+            </td>
+            <td>
+              <a class="btn btn-secondary" data-toggle="modal" data-target="#bolsaModal" data-id="{{usuario.id}}">
+                <i class="fas fa-shopping-bag"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
